@@ -1,5 +1,5 @@
 clear all; close all; clc;
-
+%
 %% parameters that must match up to real life experiment
 %these parameters are kept outside any for loops
 %currently set for the visual task with VSR
