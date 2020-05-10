@@ -11,7 +11,7 @@ initial_stim = 0.5; %visual task initially at 0.5 contrast
 %the rest of this file can go inside a for loop if we are simulating lots of
 %subjects in one go
 % withSR = zeros(1,2);
-sim_number = 200;
+sim_number = 100;
 mumean = 0.15;
 muSD = 0.05;
 
@@ -106,8 +106,13 @@ end
 figure(2)
 A = features(:,[2 3 4 5]); % the columns 
 B = features(:,[6]); % the rows
-gplotmatrix(A,B,SRvsNoSR(:)) % categorizing them based on if they have SR or not
-grid on
+[~,ax] = gplotmatrix(A,B,SRvsNoSR(:)) % categorizing them based on if they have SR or not
+ax(1,1).YLabel.String = 'Standard Deviation of Thresholds';
+ax(1,1).XLabel.String = 'Num of Thresholds Above Sham';
+ax(1,2).XLabel.String = 'Num of Direction Changes';
+ax(1,3).XLabel.String = 'Ratio of Best to Sham';
+ax(1,4).XLabel.String = 'Avg of Best and Two Neighboring';
+
 %% Create Labeled Table
 %     %rowNames = {'A', 'B','c','d','e','f','g','h','i','j'};
 %     colNames = {'Simulation Number', 'Number of Thresholds Above Sham', 'Number of Direction Changes', 'Diff Between Sham and Lowest','SR or No SR?'};

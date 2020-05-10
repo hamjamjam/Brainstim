@@ -11,22 +11,22 @@ initial_stim = 0.5; %visual task initially at 0.5 contrast
 %the rest of this file can go inside a for loop if we are simulating lots of
 %subjects in one go
 % withSR = zeros(1,2);
-sim_number = 200;
+sim_number = 100;
 mumean = 0.15;
 muSD = 0.05;
 
 %% Setting up Features matrix
 thresholds = zeros(length(levels), sim_number);
 [m,n] = size(thresholds);
-% withSRi = zeros(1,sim_number);
-% withSRi(1:2:end) = 1;
+%  withSRi = zeros(1,sim_number);
+%  withSRi(1:2:end) = 1;
 
 
 for i = 1:sim_number
     running_sim_number = i
     features(i,1) = i;
     mu = normrnd(mumean, muSD); %pick mu
-    withSR = randi([0 1],1,1);%withSRi(i); %we want to be able to choose if they have sr or not CHANGE TO 50/50
+    withSR = randi([0 1],1,1); %withSRi(i); %we want to be able to choose if they have sr or not CHANGE TO 50/50
     sigma = mu*0.33; % we want this to be a function of mu for now 
     
     %% Simulate a subject and create features table
@@ -106,8 +106,14 @@ end
 figure(2)
 A = features(:,[2 3 4 5]); % the columns 
 B = features(:,[6]); % the rows
-gplotmatrix(A,B,SRvsNoSR(:)) % categorizing them based on if they have SR or not
-grid on
+[~,ax] = gplotmatrix(A,B,SRvsNoSR(:)) % categorizing them based on if they have SR or not
+ax(1,1).YLabel.String = 'Standard Deviation of Thresholds';
+ax(1,1).XLabel.String = 'Num of Thresholds Above Sham';
+ax(1,2).XLabel.String = 'Num of Direction Changes';
+ax(1,3).XLabel.String = 'Ratio of Best to Sham';
+ax(1,4).XLabel.String = 'Avg of Best and Two Neighboring';
+set(get(gca,'ax(1,1).XLabel.Str'),'Rotation',45)
+
 %% Create Labeled Table
 %     %rowNames = {'A', 'B','c','d','e','f','g','h','i','j'};
 %     colNames = {'Simulation Number', 'Number of Thresholds Above Sham', 'Number of Direction Changes', 'Diff Between Sham and Lowest','SR or No SR?'};
@@ -148,15 +154,16 @@ TrueNeg = confusionY(1,1);
 FalsePos = confusionY(1,2);
 FalseNeg = confusionY(2,1);
 TruePos = confusionY(2,2);
-
-Accuracy = (TrueNeg + TruePos)/sim_number;
-Missclassification = (FalsePos + FalseNeg)/sim_number;
 ActualNo = FalseNeg+TruePos;
 ActualYes = TrueNeg+FalsePos;
 PredictedNo = TrueNeg+FalseNeg;
 PredictedYes = FalsePos+TruePos;
 
+Accuracy = (TrueNeg + TruePos)/sim_number;
+Misclassification = (FalsePos + FalseNeg)/sim_number;
 TruePosRate = TruePos/ActualYes;
 FalsoPosRate = FalsePos/ActualNo;
-TrueNegRate = Nr
+TrueNegRate = TrueNeg/ActualNo;
+Precision = TruePos/PredictedYes;
+Prevelance = ActualYes/sim_number;
 
