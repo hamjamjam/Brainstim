@@ -18,15 +18,15 @@ muSD = 0.05;
 %% Setting up Features matrix
 thresholds = zeros(length(levels), sim_number);
 [m,n] = size(thresholds);
-%  withSRi = zeros(1,sim_number);
-%  withSRi(1:2:end) = 1;
+% withSRi = zeros(1,sim_number);
+% withSRi(1:2:end) = 1;
 
 
 for i = 1:sim_number
     running_sim_number = i
     features(i,1) = i;
     mu = normrnd(mumean, muSD); %pick mu
-    withSR = randi([0 1],1,1); %withSRi(i); %we want to be able to choose if they have sr or not CHANGE TO 50/50
+    withSR = randi([0 1],1,1);%withSRi(i); %we want to be able to choose if they have sr or not CHANGE TO 50/50
     sigma = mu*0.33; % we want this to be a function of mu for now 
     
     %% Simulate a subject and create features table
@@ -148,16 +148,15 @@ TrueNeg = confusionY(1,1);
 FalsePos = confusionY(1,2);
 FalseNeg = confusionY(2,1);
 TruePos = confusionY(2,2);
+
+Accuracy = (TrueNeg + TruePos)/sim_number;
+Missclassification = (FalsePos + FalseNeg)/sim_number;
 ActualNo = FalseNeg+TruePos;
 ActualYes = TrueNeg+FalsePos;
 PredictedNo = TrueNeg+FalseNeg;
 PredictedYes = FalsePos+TruePos;
 
-Accuracy = (TrueNeg + TruePos)/sim_number;
-Misclassification = (FalsePos + FalseNeg)/sim_number;
 TruePosRate = TruePos/ActualYes;
 FalsoPosRate = FalsePos/ActualNo;
-TrueNegRate = TrueNeg/ActualNo;
-Precision = TruePos/PredictedYes;
-Prevelance = ActualYes/sim_number;
+TrueNegRate = Nr
 
