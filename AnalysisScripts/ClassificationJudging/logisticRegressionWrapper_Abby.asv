@@ -112,6 +112,7 @@ ax(1,1).XLabel.String = 'Num of Thresholds Above Sham';
 ax(1,2).XLabel.String = 'Num of Direction Changes';
 ax(1,3).XLabel.String = 'Ratio of Best to Sham';
 ax(1,4).XLabel.String = 'Avg of Best and Two Neighboring';
+set(get(gca,'ax(1,1).XLabel.Str'),'Rotation',45)
 
 %% Create Labeled Table
 %     %rowNames = {'A', 'B','c','d','e','f','g','h','i','j'};
