@@ -6,7 +6,7 @@
 %withSR = do we have underlying SR?
 %initial_stim = initial stimulus of the task being simulated
 
-function [thresholds]=simulateSubjectMask(mu, sigma, levels, withSR, N, initial_stim)
+function [thresholds]=simulateSubjectMask(mu, sigma, levels, withSR, N, initial_stim, masking_slope)
 
 %% set up
 guess_rate = 0.5;
@@ -16,9 +16,9 @@ sigma_guess = sigma;
 
 %What are the undrelying mus?
 if withSR == 1
-    underlyingMus = underlyingMuDropsASRaud(levels);
+    underlyingMus = underlyingMuDropsASRaud(levels, masking_slope);
 else
-    underlyingMus = underlyingMuDropsMask(levels);
+    underlyingMus = underlyingMuDropsMask(levels, masking_slope);
 end
 
 %% initilaize thresholds data structure
