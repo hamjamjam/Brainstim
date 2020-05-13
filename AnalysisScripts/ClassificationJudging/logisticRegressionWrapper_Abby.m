@@ -3,7 +3,7 @@ clear all; close all; clc;
 %% parameters that must match up to real life experiment
 %these parameters are kept outside any for loops
 %currently set for the visual task with VSR
-N = 100;
+N = 50;
 levels = [0:0.1:1]; %VSR
 initial_stim = 0.5; %visual task initially at 0.5 contrast
 
@@ -18,15 +18,15 @@ muSD = 0.05;
 %% Setting up Features matrix
 thresholds = zeros(length(levels), sim_number);
 [m,n] = size(thresholds);
-%  withSRi = zeros(1,sim_number);
-%  withSRi(1:2:end) = 1;
+  withSRi = zeros(1,sim_number);
+  withSRi(1:2:end) = 1;
 
 
 for i = 1:sim_number
-    running_sim_number = i
+    running_sim_number = i;
     features(i,1) = i;
     mu = normrnd(mumean, muSD); %pick mu
-    withSR = randi([0 1],1,1); %withSRi(i); %we want to be able to choose if they have sr or not CHANGE TO 50/50
+    withSR = withSRi(i);%randi([0 1],1,1);  %we want to be able to choose if they have sr or not, CHANGE TO 50/50
     sigma = mu*0.33; % we want this to be a function of mu for now 
     
     %% Simulate a subject and create features table
@@ -80,8 +80,17 @@ for i = 1:sim_number
         %% Variance / STD of Threshold Values, 6th column of 'features'
         
         features(i,6) = sqrt(var(thresholds(:,i)))/sigma;
+       
+        
+        %% Variance / STD of Threshold Values EXCLUDING BEST, 7th column of 'features'
+        
+        seventhcolumn(:,i) = thresholds(:,i);
+        [a(i),index] = min(seventhcolumn(:,i));
+        seventhcolumn(seventhcolumn == a(i)) = sham(i);
+
+        %features(i,7) = sqrt(var(thresholds(:,i)))/sigma;
     
-%     %% plot
+     %% plot
 %         %this is the SR plot for the subject we just simulated!
 %         figure(1);
 %         hold on
@@ -98,20 +107,17 @@ for i = 1:sim_number
 %         end
 %         hold off
 end
-% %% Just the features as matrix and with vs without SR as vector
-% Features = features(:,1:4);
-% SRvNoSR = features(:,5);
 
 %% Plotting with GPlotMatrix
-figure(2)
-A = features(:,[2 3 4 5]); % the columns 
-B = features(:,[6]); % the rows
-[~,ax] = gplotmatrix(A,B,SRvsNoSR(:)) % categorizing them based on if they have SR or not
-ax(1,1).YLabel.String = 'Standard Deviation of Thresholds';
-ax(1,1).XLabel.String = 'Num of Thresholds Above Sham';
-ax(1,2).XLabel.String = 'Num of Direction Changes';
-ax(1,3).XLabel.String = 'Ratio of Best to Sham';
-ax(1,4).XLabel.String = 'Avg of Best and Two Neighboring';
+% figure(2)
+% A = features(:,[2 3 4 5]); % the columns 
+% B = features(:,[6]); % the rows
+% [~,ax] = gplotmatrix(A,B,SRvsNoSR(:)) % categorizing them based on if they have SR or not
+% ax(1,1).YLabel.String = 'Standard Deviation of Thresholds';
+% ax(1,1).XLabel.String = 'Num of Thresholds Above Sham';
+% ax(1,2).XLabel.String = 'Num of Direction Changes';
+% ax(1,3).XLabel.String = 'Ratio of Best to Sham';
+% ax(1,4).XLabel.String = 'Avg of Best and Two Neighboring';
 
 %% Create Labeled Table
 %     %rowNames = {'A', 'B','c','d','e','f','g','h','i','j'};
@@ -119,7 +125,7 @@ ax(1,4).XLabel.String = 'Avg of Best and Two Neighboring';
 %     sTable = array2table(features,'VariableNames',colNames)
 
 %% Split data into training and test sets
-split_ind = floor(0.5*length(features)); %TEMPORARILY CHANGING TO 50/50 FOR CONFUSION MATRIX
+split_ind = floor(0.8*length(features)); %TEMPORARILY CHANGING TO 50/50 FOR CONFUSION MATRIX
 
 Xtrain = features(1:split_ind,2:end);
 Ytrain = categorical(SRvsNoSR(1:split_ind,1));
@@ -146,23 +152,43 @@ end
 percent_correct = 100*correct_predictions/length(Ytest)
 
 %% Confusion matrices
+YPredicted = categorical(round(Predicted_probabilities(:,2)))
+confusion = confusionmat(YPredicted,Ytest);
 
-confusionY = confusionmat(Ytrain,Ytest);
+ TrueNeg = confusion(1,1);
+ FalsePos = confusion(1,2);
+ FalseNeg = confusion(2,1);
+ TruePos = confusion(2,2);
+ 
+ ActualYes = FalseNeg+TruePos;
+ ActualNo = TrueNeg+FalsePos;
+ PredictedNo = TrueNeg+FalseNeg;
+ PredictedYes = FalsePos+TruePos;
+ 
+     % Create Labeled Table
+     rowNames = {'ActualNo', 'ActualYes'};
+     colNames = {'ClassedAsNo', 'ClassedAsYes'};
+     sTable = array2table(confusion,'VariableNames',colNames,'RowNames',rowNames)
+% 
+% Accuracy = (TrueNeg + TruePos)/length(Ytest);
+% Misclassification = (FalsePos + FalseNeg)/length(Ytest);
+% TruePosRate = TruePos/ActualYes;
+% FalsoPosRate = FalsePos/ActualNo;
+% TrueNegRate = TrueNeg/ActualNo;
+% Precision = TruePos/PredictedYes;
+% Prevelance = ActualYes/length(Ytest);
 
-TrueNeg = confusionY(1,1);
-FalsePos = confusionY(1,2);
-FalseNeg = confusionY(2,1);
-TruePos = confusionY(2,2);
-ActualNo = FalseNeg+TruePos;
-ActualYes = TrueNeg+FalsePos;
-PredictedNo = TrueNeg+FalseNeg;
-PredictedYes = FalsePos+TruePos;
+%% Contingency Table
 
-Accuracy = (TrueNeg + TruePos)/sim_number;
-Misclassification = (FalsePos + FalseNeg)/sim_number;
-TruePosRate = TruePos/ActualYes;
-FalsoPosRate = FalsePos/ActualNo;
-TrueNegRate = TrueNeg/ActualNo;
-Precision = TruePos/PredictedYes;
-Prevelance = ActualYes/sim_number;
+predictedvals(1,1) = ActualNo*PredictedNo / (ActualNo + ActualYes);
+predictedvals(1,2) = ActualNo*PredictedYes / (ActualNo + ActualYes);
+predictedvals(2,1) = ActualYes*PredictedNo / (ActualNo + ActualYes);
+predictedvals(2,2) = ActualYes*PredictedYes / (ActualNo + ActualYes);
 
+percentages(1,1) = (predictedvals(1,1)-TrueNeg)^2/predictedvals(1,1);
+percentages(2,1) = (predictedvals(2,1)-FalseNeg)^2/predictedvals(2,1);
+percentages(1,2) = (predictedvals(1,2)-FalsePos)^2/predictedvals(1,2);
+percentages(2,2) = (predictedvals(2,2)-TruePos)^2/predictedvals(2,2);
+sumofpercent = percentages(1,1)+percentages(1,2)+percentages(2,1)+percentages(2,2);
+
+[h,p] = vartest(sumofpercent,1,'Tail','right'); % Getting NaN value, not sure why. 
