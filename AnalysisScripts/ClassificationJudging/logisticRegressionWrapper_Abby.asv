@@ -85,14 +85,9 @@ for i = 1:sim_number
         %% Variance / STD of Threshold Values EXCLUDING BEST, 7th column of 'features'
         
         seventhcolumn(:,i) = thresholds(:,i);
-        
-        %for j = 1:length(seventhcolumn)           
-%              if min(thresholds(:,i)) == seventhcolumn(j,i) 
-                 [a,index] = findmin(seventhcolumn(:,i)));
-                 seventhcolumn(index,i) = [];
-             %end
-        % end
-        
+        [a(i),index] = min(seventhcolumn(:,i));
+        seventhcolumn(seventhcolumn == a(i)) = sham(i);
+
         %features(i,7) = sqrt(var(thresholds(:,i)))/sigma;
     
      %% plot
@@ -115,22 +110,21 @@ end
 
 %% Plotting with GPlotMatrix
 % figure(2)
-% A = features(:,[2 3 4 5]); % the columns 
+% A = features(:,[4 5]); % the columns 
 % B = features(:,[6]); % the rows
 % [~,ax] = gplotmatrix(A,B,SRvsNoSR(:)) % categorizing them based on if they have SR or not
 % ax(1,1).YLabel.String = 'Standard Deviation of Thresholds';
-% ax(1,1).XLabel.String = 'Num of Thresholds Above Sham';
-% ax(1,2).XLabel.String = 'Num of Direction Changes';
-% ax(1,3).XLabel.String = 'Ratio of Best to Sham';
-% ax(1,4).XLabel.String = 'Avg of Best and Two Neighboring';
+% ax(1,1).XLabel.String = 'Ratio of Best to Sham';
+% ax(1,2).XLabel.String = 'Avg of Best and Two Neighboring';
+% title('100 Simulations with N=50')
 
-%% Create Labeled Table
+%% Create 'Features' Table
 %     %rowNames = {'A', 'B','c','d','e','f','g','h','i','j'};
 %     colNames = {'Simulation Number', 'Number of Thresholds Above Sham', 'Number of Direction Changes', 'Diff Between Sham and Lowest','SR or No SR?'};
 %     sTable = array2table(features,'VariableNames',colNames)
 
 %% Split data into training and test sets
-split_ind = floor(0.8*length(features)); %TEMPORARILY CHANGING TO 50/50 FOR CONFUSION MATRIX
+split_ind = floor(0.8*length(features)); 
 
 Xtrain = features(1:split_ind,2:end);
 Ytrain = categorical(SRvsNoSR(1:split_ind,1));
@@ -157,7 +151,7 @@ end
 percent_correct = 100*correct_predictions/length(Ytest)
 
 %% Confusion matrices
-YPredicted = categorical(round(Predicted_probabilities(:,2)))
+YPredicted = categorical(round(Predicted_probabilities(:,2)));
 confusion = confusionmat(YPredicted,Ytest);
 
  TrueNeg = confusion(1,1);
@@ -175,13 +169,13 @@ confusion = confusionmat(YPredicted,Ytest);
      colNames = {'ClassedAsNo', 'ClassedAsYes'};
      sTable = array2table(confusion,'VariableNames',colNames,'RowNames',rowNames)
 % 
-% Accuracy = (TrueNeg + TruePos)/length(Ytest);
-% Misclassification = (FalsePos + FalseNeg)/length(Ytest);
-% TruePosRate = TruePos/ActualYes;
-% FalsoPosRate = FalsePos/ActualNo;
-% TrueNegRate = TrueNeg/ActualNo;
-% Precision = TruePos/PredictedYes;
-% Prevelance = ActualYes/length(Ytest);
+Accuracy = (TrueNeg + TruePos)/length(Ytest);
+Misclassification = (FalsePos + FalseNeg)/length(Ytest);
+TruePosRate = TruePos/ActualYes;
+FalsoPosRate = FalsePos/ActualNo;
+TrueNegRate = TrueNeg/ActualNo;
+Precision = TruePos/PredictedYes;
+Prevelance = ActualYes/length(Ytest);
 
 %% Contingency Table
 
@@ -195,5 +189,10 @@ percentages(2,1) = (predictedvals(2,1)-FalseNeg)^2/predictedvals(2,1);
 percentages(1,2) = (predictedvals(1,2)-FalsePos)^2/predictedvals(1,2);
 percentages(2,2) = (predictedvals(2,2)-TruePos)^2/predictedvals(2,2);
 sumofpercent = percentages(1,1)+percentages(1,2)+percentages(2,1)+percentages(2,2);
+
+chi(1) = ActualNo
+chi2pdf = chi2pdf(sumofpercent,1)
+
+chi2cdf = chi2cdf(sumofpercent,1,'upper')
 
 [h,p] = vartest(sumofpercent,1,'Tail','right'); % Getting NaN value, not sure why. 

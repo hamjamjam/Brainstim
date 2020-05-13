@@ -11,7 +11,7 @@ initial_stim = 0.5; %visual task initially at 0.5 contrast
 %the rest of this file can go inside a for loop if we are simulating lots of
 %subjects in one go
 % withSR = zeros(1,2);
-sim_number = 100;
+sim_number = 2000;
 mumean = 0.15;
 muSD = 0.05;
 
@@ -48,12 +48,6 @@ for i = 1:sim_number
             end
         end
         features(i,3) = sum(directionchange(:,1));
-        
-    %% Difference between lowest threshold value and sham
-    
-        %features(i,4) = sham(i) - min(thresholds(2:end,i));
-        % this value will be positive unless sham is the lowest point, then
-        % this value will be zero
     
     %% Ratio of best threshold to sham, 4th column of 'features'
         features(i,4) = min(thresholds(2:end,i))/sham(i);
@@ -80,7 +74,6 @@ for i = 1:sim_number
         %% Variance / STD of Threshold Values, 6th column of 'features'
         
         features(i,6) = sqrt(var(thresholds(:,i)))/sigma;
-       
         
         %% Variance / STD of Threshold Values EXCLUDING BEST, 7th column of 'features'
         
@@ -110,22 +103,21 @@ end
 
 %% Plotting with GPlotMatrix
 % figure(2)
-% A = features(:,[2 3 4 5]); % the columns 
+% A = features(:,[4 5]); % the columns 
 % B = features(:,[6]); % the rows
 % [~,ax] = gplotmatrix(A,B,SRvsNoSR(:)) % categorizing them based on if they have SR or not
 % ax(1,1).YLabel.String = 'Standard Deviation of Thresholds';
-% ax(1,1).XLabel.String = 'Num of Thresholds Above Sham';
-% ax(1,2).XLabel.String = 'Num of Direction Changes';
-% ax(1,3).XLabel.String = 'Ratio of Best to Sham';
-% ax(1,4).XLabel.String = 'Avg of Best and Two Neighboring';
+% ax(1,1).XLabel.String = 'Ratio of Best to Sham';
+% ax(1,2).XLabel.String = 'Avg of Best and Two Neighboring';
+% title('100 Simulations with N=50')
 
-%% Create Labeled Table
+%% Create 'Features' Table
 %     %rowNames = {'A', 'B','c','d','e','f','g','h','i','j'};
 %     colNames = {'Simulation Number', 'Number of Thresholds Above Sham', 'Number of Direction Changes', 'Diff Between Sham and Lowest','SR or No SR?'};
 %     sTable = array2table(features,'VariableNames',colNames)
 
 %% Split data into training and test sets
-split_ind = floor(0.8*length(features)); %TEMPORARILY CHANGING TO 50/50 FOR CONFUSION MATRIX
+split_ind = floor(0.8*length(features)); 
 
 Xtrain = features(1:split_ind,2:end);
 Ytrain = categorical(SRvsNoSR(1:split_ind,1));
@@ -152,8 +144,8 @@ end
 percent_correct = 100*correct_predictions/length(Ytest)
 
 %% Confusion matrices
-YPredicted = categorical(round(Predicted_probabilities(:,2)))
-confusion = confusionmat(YPredicted,Ytest);
+ YPredicted = categorical(round(Predicted_probabilities(:,2)));
+ confusion = confusionmat(Ytest,YPredicted);
 
  TrueNeg = confusion(1,1);
  FalsePos = confusion(1,2);
@@ -165,20 +157,21 @@ confusion = confusionmat(YPredicted,Ytest);
  PredictedNo = TrueNeg+FalseNeg;
  PredictedYes = FalsePos+TruePos;
  
-     % Create Labeled Table
-     rowNames = {'ActualNo', 'ActualYes'};
-     colNames = {'ClassedAsNo', 'ClassedAsYes'};
-     sTable = array2table(confusion,'VariableNames',colNames,'RowNames',rowNames)
-% 
-% Accuracy = (TrueNeg + TruePos)/length(Ytest);
-% Misclassification = (FalsePos + FalseNeg)/length(Ytest);
-% TruePosRate = TruePos/ActualYes;
-% FalsoPosRate = FalsePos/ActualNo;
-% TrueNegRate = TrueNeg/ActualNo;
-% Precision = TruePos/PredictedYes;
-% Prevelance = ActualYes/length(Ytest);
+ % Create Labeled Table
+ rowNames = {'ActualNo', 'ActualYes'};
+ colNames = {'ClassedAsNo', 'ClassedAsYes'};
+ sTable = array2table(confusion,'VariableNames',colNames,'RowNames',rowNames)
+ 
+ % Useful Information
+ Accuracy = (TrueNeg + TruePos)/length(Ytest);
+ Misclassification = (FalsePos + FalseNeg)/length(Ytest);
+ TruePosRate = TruePos/ActualYes;
+ FalsoPosRate = FalsePos/ActualNo;
+ TrueNegRate = TrueNeg/ActualNo;
+ Precision = TruePos/PredictedYes;
+ Prevelance = ActualYes/length(Ytest);
 
-%% Contingency Table
+%% Chi^2 and p val
 
 predictedvals(1,1) = ActualNo*PredictedNo / (ActualNo + ActualYes);
 predictedvals(1,2) = ActualNo*PredictedYes / (ActualNo + ActualYes);
@@ -191,4 +184,5 @@ percentages(1,2) = (predictedvals(1,2)-FalsePos)^2/predictedvals(1,2);
 percentages(2,2) = (predictedvals(2,2)-TruePos)^2/predictedvals(2,2);
 sumofpercent = percentages(1,1)+percentages(1,2)+percentages(2,1)+percentages(2,2);
 
-[h,p] = vartest(sumofpercent,1,'Tail','right'); % Getting NaN value, not sure why. 
+
+p = chi2cdf(sumofpercent,1,'upper')
