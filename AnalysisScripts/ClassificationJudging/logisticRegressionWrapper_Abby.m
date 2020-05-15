@@ -73,15 +73,15 @@ for i = 1:sim_number
 
         %% Variance / STD of Threshold Values, 6th column of 'features'
         
-        features(i,6) = sqrt(var(thresholds(:,i)))/sigma;
+        features(i,6) = var(thresholds(:,i))/sigma;
         
         %% Variance / STD of Threshold Values EXCLUDING BEST, 7th column of 'features'
         
         seventhcolumn(:,i) = thresholds(:,i);
         [a(i),index] = min(seventhcolumn(:,i));
-        seventhcolumn(seventhcolumn == a(i)) = sham(i);
+        seventhcolumn(seventhcolumn == a(i)) = mean(thresholds(:,i));
 
-        %features(i,7) = sqrt(var(thresholds(:,i)))/sigma;
+        %features(i,6) = var(seventhcolumn(:,i))/sigma;
     
      %% plot
 %         %this is the SR plot for the subject we just simulated!
