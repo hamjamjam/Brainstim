@@ -11,7 +11,7 @@ initial_stim = 0.5; %visual task initially at 0.5 contrast
 %the rest of this file can go inside a for loop if we are simulating lots of
 %subjects in one go
 % withSR = zeros(1,2);
-sim_number = 500;
+sim_number = 200;
 mumean = 0.15;
 muSD = 0.05;
 
@@ -35,9 +35,9 @@ for i = 1:sim_number
         [thresholds(:,i)]= simulateSubject(mu, sigma, levels, withSR, N, initial_stim);
     %% Number of threshold values above sham, 2nd column of 'features'
          sham(i) = thresholds(1,i);
-         features(i,2) = sum(thresholds(2:end,i) > sham(i));
+         %features(i,2) = sum(thresholds(2:end,i) > sham(i));
         
-       % [features(:,2)] = thresholds_above_sham(thresholds,sham(i))
+        [features(:,2)] = thresholds_above_sham(thresholds,sham(i))
     %% Number of direction changes ignoring first and last values, 3rd column of 'features'
         direction(:,i) = diff(thresholds(:,i));
         [m,n] = size(direction);
@@ -76,7 +76,7 @@ for i = 1:sim_number
 
         %% Variance / STD of Threshold Values, 6th column of 'features'
         
-        features(i,6) = sqrt(var(thresholds(:,i)))/sigma;
+        features(i,6) = var(thresholds(:,i))/sigma;
         
         %% Variance / STD of Threshold Values EXCLUDING BEST, 7th column of 'features'
         
