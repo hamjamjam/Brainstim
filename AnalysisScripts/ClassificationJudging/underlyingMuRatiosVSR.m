@@ -16,7 +16,7 @@ A2 = -A0.*(1./q2.^2).*(r2./(sqrt(4*r2 + w))); %linspace of A as per q2
 A2 = 1.+A2;
 underlying_ratio = [A1 A2];
 SRNoise = [q1 q2]; 
-SRNoise = 0.09+SRNoise/3.75;
+SRNoise = SRNoise/3.75;
 % plot(SRNoise,underlying_ratio)
 % ylim([0 1])
 % xlim([0 1])

@@ -6,7 +6,7 @@
 %withSR = do we have underlying SR? 0 for no SR 1 for SR
 %initial_stim = initial stimulus of the task being simulated
 
-function [thresholds]=simulateSubject(mu, sigma, levels, withSR, N, initial_stim)
+function [thresholds]=simulateSubject(mu, sigma, withSR, N, initial_stim, ratios)
 
 %% set up of threshold estimate simulations
 guess_rate = 0.5; %at really small stim levels, 50% correct
@@ -16,19 +16,19 @@ sigma_guess = sigma; %starting point is real sigma
 
 %We need to pick an underlying mu for each SR Noise level
 if withSR == 1
-    underlyingMus = mu*underlyingMuRatiosVSR(levels); %this calls another function - for now, don't worry about that function
+    underlyingMus = mu*ratios; %this calls another function - for now, don't worry about that function
 else
-    underlyingMus = mu*ones(1,length(levels));
+    underlyingMus = mu*ones(1,length(ratios));
 end
 
 %% initilaize list of thresholds
-thresholds = zeros(1,length(levels));
+thresholds = zeros(1,length(ratios));
 
 %% simulate
 %we are running that single threshold estimate simulation for every SR Noise Level
 %in the 'levels' list because we want to assign a simulated threshold to to
 %each SR Noise Level
-for i = 1:length(levels)
+for i = 1:length(ratios)
     mutemp = underlyingMus(i); %the mu we
     [X, Y, cor, lapses] = pest_mod_2int(N, mutemp, sigma, guess_rate, lapse_rate, plot_on, initial_stim);
     mu_guess = mutemp;
