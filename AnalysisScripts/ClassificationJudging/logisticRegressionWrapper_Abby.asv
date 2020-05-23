@@ -11,7 +11,7 @@ initial_stim = 0.5; %visual task initially at 0.5 contrast
 %the rest of this file can go inside a for loop if we are simulating lots of
 %subjects in one go
 % withSR = zeros(1,2);
-sim_number = 200;
+sim_number = 10;
 mumean = 0.15;
 muSD = 0.05;
 
@@ -22,7 +22,7 @@ withSRi = zeros(1,sim_number);
 withSRi(1:2:end) = 1;
 features = zeros(sim_number,6);
 
-for l = 1:5
+%for l = 1:5
 for i = 1:sim_number
     running_sim_number = i;
     features(i,1) = i;
@@ -34,10 +34,10 @@ for i = 1:sim_number
         %we get back a list of their thresholds for each stimulus level
         [thresholds(:,i)]= simulateSubject(mu, sigma, levels, withSR, N, initial_stim);
     %% Number of threshold values above sham, 2nd column of 'features'
-         sham(i) = thresholds(1,i);
-         %features(i,2) = sum(thresholds(2:end,i) > sham(i));
+%           sham(i) = thresholds(1,i);
+%           features(i,2) = sum(thresholds(2:end,i) > sham(i));
         
-        [features(:,2)] = thresholds_above_sham(thresholds,sham(i))
+      [sham,features] = thresholds_above_sham(thresholds,i)
     %% Number of direction changes ignoring first and last values, 3rd column of 'features'
         direction(:,i) = diff(thresholds(:,i));
         [m,n] = size(direction);
@@ -76,7 +76,7 @@ for i = 1:sim_number
 
         %% Variance / STD of Threshold Values, 6th column of 'features'
         
-        features(i,6) = var(thresholds(:,i))/sigma;
+        features(i,6) = sqrt(var(thresholds(:,i)))/sigma;
         
         %% Variance / STD of Threshold Values EXCLUDING BEST, 7th column of 'features'
         
@@ -90,21 +90,8 @@ for i = 1:sim_number
         %INCLUDING BEST AND EXCLUDING BEST
     
      %% plot
-%         %this is the SR plot for the subject we just simulated!
-%         figure(1);
-%         hold on
-%         subplot(2, 5 ,(i)); % This needs to be changed depending on how many simulations are run
-%         plot(levels, thresholds(:,i),'*--');
-%         ylim([0 0.5]);
-%         xticks(levels);
-%         xlabel('SR Noise Level (mA)');
-%         ylabel('Visual Contrast Threshold');
-%         if withSR ==1
-%             title('Simulated Subject with SR');
-%         else
-%             title('Simulated Subject without SR');
-%         end
-%         hold off
+     SubplotSR(thresholds,i,levels,withSR)
+     
 end
 
 %% Plotting with GPlotMatrix (Blue and Green Dots)
@@ -186,7 +173,5 @@ percentages(2,2) = (predictedvals(2,2)-TruePos)^2/predictedvals(2,2);
 sumofpercent = percentages(1,1)+percentages(1,2)+percentages(2,1)+percentages(2,2);
 
 
-p(l) = chi2cdf(sumofpercent,1,'upper')
-end
-
-plot(1:5,p(l))
+p = chi2cdf(sumofpercent,1,'upper')
+%end
