@@ -1,4 +1,5 @@
 function [features,direction,m,n,directionchange] = direction_changes(i,thresholds,features)
+
         direction(:,i) = diff(thresholds(:,i));
         [m,n] = size(direction);
         directionchange = zeros(length(direction),2);
@@ -10,6 +11,6 @@ function [features,direction,m,n,directionchange] = direction_changes(i,threshol
                 directionchange(j,1) = 0;
             end
         end
-        directions = sum(directionchange(:,1));
-        features(i,3) = directions;
+        numofdirectionchanges = sum(directionchange(:,1));
+        features(i,3) = numofdirectionchanges;
 end

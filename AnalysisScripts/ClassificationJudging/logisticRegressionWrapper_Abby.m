@@ -11,19 +11,22 @@ initial_stim = 0.5; %visual task initially at 0.5 contrast
 %the rest of this file can go inside a for loop if we are simulating lots of
 %subjects in one go
 % withSR = zeros(1,2);
-sim_number = 10;
+sim_number = 100;
 mumean = 0.15;
 muSD = 0.05;
 
-%% Setting up Features matrix
+%% Initializing Values that needed to be initialized outside of the for loops
 thresholds = zeros(length(levels), sim_number);
 [m,n] = size(thresholds);
 withSRi = zeros(1,sim_number);
 withSRi(1:2:end) = 1;
 features = zeros(sim_number,6);
 
-%for l = 1:5
+%% Run the number of simulations (100) 5 times
+for l = 1:5
+%% Run 100 simulations
 for i = 1:sim_number
+    %Initializing values needed to run the simulations
     running_sim_number = i;
     features(i,1) = i;
     mu = normrnd(mumean, muSD); %pick mu
@@ -31,79 +34,65 @@ for i = 1:sim_number
     sigma = mu*0.33; % we want this to be a function of mu for now 
     
     %% Simulate a subject and create features table
+    
         %we get back a list of their thresholds for each stimulus level
         [thresholds(:,i)]= simulateSubject(mu, sigma, levels, withSR, N, initial_stim);
+        
     %% Number of threshold values above sham, 2nd column of 'features'
-        sham(i) = thresholds(1,i);
-%             features(i,2) = sum(thresholds(2:end,i) > sham(i));
-         
-       [features] = thresholds_above_sham(i,thresholds(:,i),features,sham(i));
+    
+        %we get back the sham for each simulation, as well as the second
+        %column of the 'features matrix', which is the number of threshold
+        %values above sham for any specified simulation
+        sham(i) = thresholds(1,i); 
+        [features] = thresholds_above_sham(i,thresholds(:,i),features,sham(i));
+       
     %% Number of direction changes ignoring first and last values, 3rd column of 'features'
-%         direction(:,i) = diff(thresholds(:,i));
-%         [m,n] = size(direction);
-%         directionchange = zeros(length(direction),2);
-%     
-%         for j = 1:(m-1)
-%             if (direction(j+1,i) > 0) && (direction(j,i) < 0) || (direction(j+1,i) < 0) && (direction(j,i) > 0)
-%                 directionchange(j,1) = 1;
-%             else 
-%                 directionchange(j,1) = 0;
-%             end
-%         end
-%         features(i,3) = sum(directionchange(:,1));
-    [features,direction,m,n,directionchange] = direction_changes(i,thresholds,features);
+
+        % returns the number of direction changes that each simulation has,
+        % excluding first and last values. This is the third column of 'features'
+        [features] = direction_changes(i,thresholds,features);
+    
     %% Ratio of best threshold to sham, 4th column of 'features'
+    
+        % returns the ratio of lowest threshold value to sham value for
+        % each simulaiton. Fourth column of 'features'
         features(i,4) = min(thresholds(2:end,i))/sham(i);
         
     %% Avg of best and 2 neighboring, 5th column of 'features'
 
-        if min(thresholds(2:end-1,i)) < sham(i)
-            [m,n] = min(thresholds(1:end-1,i));
-            minthresholds = [ thresholds(n,i), thresholds(n-1,i),  thresholds(n+1,i)];                    
-        elseif min(thresholds)==sham(i)
-            minthresholds = [ thresholds(1,i), thresholds(2,i),  thresholds(3,i)];
-        else
-            minthresholds = [ thresholds(end,i), thresholds(end-1,i),  thresholds(end-2,i)]; 
-        end
-        features(i,5) = mean(minthresholds)/sham(i); 
+        % returns the average value of the lowest threshold and the two
+        % surrounding it for each simulation. Fifth column of 'features'
+        [features] = avg_of_best_and_2_neighboring(i,thresholds,sham,features);
+        
     %% Clarify if the subject has SR or no SR
-       
+        
+        %This tells the simulation whether there is an underlying SR or Not
         if withSR == 1
             SRvsNoSR(i,1) = 1;
         else
             SRvsNoSR(i,1) = 0;
         end
 
-        %% Variance / STD of Threshold Values, 6th column of 'features'
+    %% Variance / STD of Threshold Values, 6th column of 'features'
         
-        features(i,6) = sqrt(var(thresholds(:,i)))/sigma;
+        % This is the standard deviation of all threshold values for each
+        % simulation including the lowest threshold value
+        [features] = standard_deviation_thresholds(i,thresholds,sigma,features);
         
-        %% Variance / STD of Threshold Values EXCLUDING BEST, 7th column of 'features'
-        
-        seventhcolumn(:,i) = thresholds(:,i);
-        [a(i),index] = min(seventhcolumn(:,i));
-        seventhcolumn(seventhcolumn == a(i)) = mean(thresholds(:,i));
-
-        %features(i,6) = var(seventhcolumn(:,i))/sigma;
-        
-        %DID NOT TELL A DIFFERENCE BETWEEN STD AND VARIANCE, OR BETWEEN
+        %COULD NOT TELL A DIFFERENCE BETWEEN STD AND VARIANCE, OR BETWEEN
         %INCLUDING BEST AND EXCLUDING BEST
     
-     %% plot
-     SubplotSR(thresholds,i,levels,withSR)
+    %% plot if running 10 simulations
+    
+        %SubplotSR(thresholds,i,levels,withSR)
      
 end
 
 %% Plotting with GPlotMatrix (Blue and Green Dots)
-% figure(2)
-% A = features(:,[4 5]); % the columns 
-% B = features(:,[6]); % the rows
-% [~,ax] = gplotmatrix(A,B,SRvsNoSR(:)) % categorizing them based on if they have SR or not
-% ax(1,1).YLabel.String = 'Standard Deviation of Thresholds';
-% ax(1,1).XLabel.String = 'Ratio of Best to Sham';
-% ax(1,2).XLabel.String = 'Avg of Best and Two Neighboring';
-% title('100 Simulations with N=50')
 
+%this is useful when visually comparing more than one feature with another
+%plotmatrix(features,SRvsNoSR)
+    
 %% Split data into training and test sets
 split_ind = floor(0.8*length(features)); 
 
@@ -113,65 +102,20 @@ Xtest = features((split_ind+1):end,2:end);
 Ytest = categorical(SRvsNoSR((split_ind+1):end,1));
 
 %% Fit model to training set
+
 [B,dev,stats] = mnrfit(Xtrain,Ytrain,'interactions','on');
 
 %% Predict probabilities for test set
+
 Predicted_probabilities = mnrval(B, Xtest);
 
-%% Count how many predictions were correct
-
-correct_predictions = 0;
-for i=1:length(Ytest)
-    predict_i = categorical(round(Predicted_probabilities(i,2)));
-    if predict_i == Ytest(i)
-        correct_predictions = correct_predictions + 1;
-    end
-end
-
-%% Print out the % of predictions that were correct
-percent_correct = 100*correct_predictions/length(Ytest)
-
 %% Confusion matrices
- YPredicted = categorical(round(Predicted_probabilities(:,2)));
- confusion = confusionmat(Ytest,YPredicted);
 
- TrueNeg = confusion(1,1);
- FalsePos = confusion(1,2);
- FalseNeg = confusion(2,1);
- TruePos = confusion(2,2);
- 
- ActualYes = FalseNeg+TruePos;
- ActualNo = TrueNeg+FalsePos;
- PredictedNo = TrueNeg+FalseNeg;
- PredictedYes = FalsePos+TruePos;
- 
- % Create Labeled Table
- rowNames = {'ActualNo', 'ActualYes'};
- colNames = {'ClassedAsNo', 'ClassedAsYes'};
- sTable = array2table(confusion,'VariableNames',colNames,'RowNames',rowNames)
- 
- % Useful Information
- Accuracy = (TrueNeg + TruePos)/length(Ytest);
- Misclassification = (FalsePos + FalseNeg)/length(Ytest);
- TruePosRate = TruePos/ActualYes;
- FalsoPosRate = FalsePos/ActualNo;
- TrueNegRate = TrueNeg/ActualNo;
- Precision = TruePos/PredictedYes;
- Prevelance = ActualYes/length(Ytest);
+% This helps us understand the accuracy of the code
+[YPredicted,confusion, Accuracy, ActualNo, PredictedNo, ActualYes, PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos] = confusion_matrix(Predicted_probabilities,Ytest);
 
 %% Chi^2 and p val based on excel 
 
-predictedvals(1,1) = ActualNo*PredictedNo / (ActualNo + ActualYes);
-predictedvals(1,2) = ActualNo*PredictedYes / (ActualNo + ActualYes);
-predictedvals(2,1) = ActualYes*PredictedNo / (ActualNo + ActualYes);
-predictedvals(2,2) = ActualYes*PredictedYes / (ActualNo + ActualYes);
-
-percentages(1,1) = (predictedvals(1,1)-TrueNeg)^2/predictedvals(1,1);
-percentages(2,1) = (predictedvals(2,1)-FalseNeg)^2/predictedvals(2,1);
-percentages(1,2) = (predictedvals(1,2)-FalsePos)^2/predictedvals(1,2);
-percentages(2,2) = (predictedvals(2,2)-TruePos)^2/predictedvals(2,2);
-sumofpercent = percentages(1,1)+percentages(1,2)+percentages(2,1)+percentages(2,2);
-
-
-p = chi2cdf(sumofpercent,1,'upper')
-%end
+%Chi^2 to help us see how useful the 
+[p] = chi_sq(ActualNo,PredictedNo,ActualYes,PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos);
+end
