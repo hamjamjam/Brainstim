@@ -1,5 +1,6 @@
 function [YPredicted,confusion, Accuracy, ActualNo, PredictedNo, ActualYes, PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos] = confusion_matrix(Predicted_probabilities,Ytest)
- YPredicted = categorical(round(Predicted_probabilities(:,2)));
+ 
+YPredicted = categorical(round(Predicted_probabilities(:,2)));
  confusion = confusionmat(Ytest,YPredicted);
 
  TrueNeg = confusion(1,1);

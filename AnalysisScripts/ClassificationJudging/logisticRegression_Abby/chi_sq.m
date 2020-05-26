@@ -1,4 +1,4 @@
-function [p] = chi_sq(ActualNo,PredictedNo,ActualYes,PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos)
+function [p_chi2] = chi_sq(ActualNo,PredictedNo,ActualYes,PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos)
 
 predictedvals(1,1) = ActualNo*PredictedNo / (ActualNo + ActualYes);
 predictedvals(1,2) = ActualNo*PredictedYes / (ActualNo + ActualYes);
@@ -12,6 +12,6 @@ percentages(2,2) = (predictedvals(2,2)-TruePos)^2/predictedvals(2,2);
 sumofpercent = percentages(1,1)+percentages(1,2)+percentages(2,1)+percentages(2,2);
 
 
-p = chi2cdf(sumofpercent,1,'upper')
+p_chi2 = chi2cdf(sumofpercent,1,'upper');
 
 end

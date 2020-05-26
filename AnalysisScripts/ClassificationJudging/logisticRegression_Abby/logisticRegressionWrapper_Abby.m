@@ -11,7 +11,7 @@ initial_stim = 0.5; %visual task initially at 0.5 contrast
 %the rest of this file can go inside a for loop if we are simulating lots of
 %subjects in one go
 % withSR = zeros(1,2);
-sim_number = 500;
+sim_number = 2000;
 mumean = 0.15;
 muSD = 0.05;
 
@@ -114,8 +114,12 @@ end
 %% Chi^2 and p val based on excel 
 
     % Chi^2 
-    [p] = chi_sq(ActualNo,PredictedNo,ActualYes,PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos);
+    [p_chi2] = chi_sq(ActualNo,PredictedNo,ActualYes,PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos);
     
+%% Correlation Coefficients
+ 
+   [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,s,YPredict,Ytest] = correlation_coefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest);
+ 
 %% End outer for loop
 
 %end
