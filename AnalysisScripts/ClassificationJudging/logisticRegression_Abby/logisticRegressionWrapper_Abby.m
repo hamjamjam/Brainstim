@@ -118,7 +118,7 @@ end
     
 %% Correlation Coefficients
  
-   [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,s,YPredict,Ytest] = correlation_coefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest);
+   [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,YPredict,Ytest] = correlation_coefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest);
  
 %% End outer for loop
 
