@@ -1,9 +1,9 @@
-function [features] = standardDeviationThresholds(i,thresholds,sigma,features)
+function [StandardDeviationIncludingBest] = standardDeviationThresholds(i,thresholds,sigma)
  
-    includingBest = sqrt(var(thresholds(:,i)))/sigma; %taking a sqrt of variance give standard deviation. Normalized by sham.
-    features(i,6) = includingBest; %this is the 6th column of 'features'
+    StandardDeviationIncludingBest(i) = sqrt(var(thresholds(:,i)))/sigma; %taking a sqrt of variance give standard deviation. Normalized by sham.
+   
     
-    % uncomment the following if wanting to change to exclude min threshold value
+    % uncomment the following if you want to change to exclude min threshold value
 %     sixthColumn(:,i) = thresholds(:,i);
 %     [a(i),index] = min(sixthColumn(:,i));
 %     sixthColumn(sixthColumn == a(i)) = mean(thresholds(:,i));

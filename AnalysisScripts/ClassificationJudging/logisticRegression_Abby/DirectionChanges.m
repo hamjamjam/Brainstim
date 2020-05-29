@@ -1,4 +1,4 @@
-function [features,direction] = DirectionChanges(i,thresholds,features)
+function [numberOfDirectionChanges] = DirectionChanges(i,thresholds)
 
         direction(:,i) = diff(thresholds(:,i)); %First needed to find the difference between each threshold per simulation
         [m,n] = size(direction);
@@ -11,6 +11,6 @@ function [features,direction] = DirectionChanges(i,thresholds,features)
                 directionchange(j,1) = 0;
             end
         end
-        numofdirectionchanges = sum(directionchange(:,1)); %add up all of the ones to create a number of changes
-        features(i,3) = numofdirectionchanges; %3rd column of 'features'
+        numberOfDirectionChanges(i) = sum(directionchange(:,1)); %add up all of the ones to create a number of changes
+      
 end

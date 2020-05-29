@@ -1,4 +1,4 @@
-function [features] = AvgBestand2Neighboring(i,thresholds,sham,features)
+function [avgOfBestand2Neighboring] = AvgBestand2Neighboring(i,thresholds,sham)
 
     if min(thresholds(2:end-1,i)) < sham(i) %if the min threshold value is below sham
             [m,n] = min(thresholds(1:end-1,i)); %index its location
@@ -11,7 +11,7 @@ function [features] = AvgBestand2Neighboring(i,thresholds,sham,features)
             minthresholds = [ thresholds(end,i), thresholds(end-1,i),  thresholds(end-2,i)]; %array of the last 3 thresholds
         
     end
-        avgofbest = mean(minthresholds)/sham(i); %find average of each array created
-        features(i,5) = avgofbest; %5th column of features
+        avgOfBestand2Neighboring(i) = mean(minthresholds)/sham(i); %find average of each array created
+       
         
 end

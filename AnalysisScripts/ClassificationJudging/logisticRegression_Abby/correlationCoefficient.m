@@ -39,7 +39,7 @@ CorrelationMatrix{10,2} = features(:,6);
 %R and the p-matrix into a cell in P and creating an array of matrices. 
 
 % Correlation between 2nd feature and all others
-[R{1},P{1}] = corrcoef(features(:,2),features(:,3)); 
+[R{1},P{1}] = corrcoef(features(:,2),features(:,3));
 [R{2},P{2}] = corrcoef(features(:,2),features(:,4)); 
 [R{3},P{3}] = corrcoef(features(:,2),features(:,5));
 [R{4},P{4}] = corrcoef(features(:,2),features(:,6));

@@ -9,7 +9,7 @@ levels = [0:0.1:1]; %VSR
 initial_stim = 0.5; %visual task initially at 0.5 contrast
 
 %% parameters that we change
-sim_number = 100; %number of simulations
+sim_number = 200; %number of simulations
 mumean = 0.15;
 muSD = 0.05;
 
@@ -28,12 +28,11 @@ for i = 1:sim_number
     
     %Initializing values needed to run the simulations
         running_sim_number = i; %if running into errors, unsuppress this and you can see how many times the loop is running
-        features(i,1) = i; %the first column of 'features' is the simulation number
         mu = normrnd(mumean, muSD); %pick mu
         withSR = withSRInitial(i);%randi([0 1],1,1);  %we want to be able to choose if they have sr or not
         sigma = mu*0.33; % we want this to be a function of mu for now 
     
-    %% Simulate a subject and create features table
+    %% Simulate a subject
     
         %we get back a list of their thresholds for each stimulus level
         [thresholds(:,i)]= simulateSubject(mu, sigma, levels, withSR, N, initial_stim);
@@ -43,25 +42,34 @@ for i = 1:sim_number
         %we get back the sham for each simulation, as well as the second column of the 'features matrix', which is the number of threshold
         %values above sham for any specified simulation
         sham(i) = thresholds(1,i); %sham is the first threshold value for each simulation
-        [features] = ThresholdsAboveSham(i,thresholds(:,i),features,sham(i)); %this tells us the number of thresholds above sham for each simulation
-       
+        [numberOfThresholdsAboveSham] = ThresholdsAboveSham(i,thresholds(:,i),sham(i)); %this tells us the number of thresholds above sham for each simulation
+
     %% Number of direction changes ignoring first and last values, 3rd column of 'features'
 
         % returns the number of direction changes that each simulation has, excluding first and last values. This is the third column of 'features'
-        [features,direction] = DirectionChanges(i,thresholds,features);
+        [numberOfDirectionChanges] = DirectionChanges(i,thresholds);
         
     %% Ratio of best threshold to sham, 4th column of 'features'
     
         % returns the ratio of lowest threshold value to sham value for each simulaiton. Fourth column of 'features'
-        features(i,4) = min(thresholds(2:end,i))/sham(i); 
+        ratioOfBestvsSham(i) = min(thresholds(2:end,i))/sham(i); 
         %did not create a separate feature because it was just one line of code
        
     %% Avg of best and 2 neighboring, 5th column of 'features'
 
         % returns the average value of the lowest threshold and the two surrounding it for each simulation. Fifth column of 'features'
-        [features] = AvgBestand2Neighboring(i,thresholds,sham,features);
+        [avgOfBestand2Neighboring] = AvgBestand2Neighboring(i,thresholds,sham);
+           
+    %% Variance / STD of Threshold Values, 6th column of 'features'
         
-    %% Clarify if the subject has SR or no SR
+        % This is the standard deviation of all threshold values for each simulation including the lowest threshold value
+        [StandardDeviationIncludingBest] = standardDeviationThresholds(i,thresholds,sigma);
+        
+        %No clear difference between standard deviation and variance, or
+        %between including lowest threshold value and excluding lowest
+        %threshold value. Currently set to be standard deviation including best
+        
+     %% Clarify if the subject has SR or no SR
         
         %This tells the simulation whether there is an underlying SR or Not.
         %also creates an array of 1's and 0's for the analyses done later
@@ -71,19 +79,18 @@ for i = 1:sim_number
             SRvsNoSR(i,1) = 0;
         end
 
-    %% Variance / STD of Threshold Values, 6th column of 'features'
-        
-        % This is the standard deviation of all threshold values for each simulation including the lowest threshold value
-        [features] = standardDeviationThresholds(i,thresholds,sigma,features);
-        
-        %No clear difference between standard deviation and variance, or
-        %between including lowest threshold value and excluding lowest
-        %threshold value. Currently set to be standard deviation including best
-    
     %% plot if running 10 simulations
     
         %SubplotSR(thresholds,i,levels,withSR)
-     
+        
+%% Features Matrix
+features(i,1) = i; %the first column of 'features' is the simulation number
+features(i,2) = numberOfThresholdsAboveSham(i);
+features(i,3) = numberOfDirectionChanges(i);    
+features(i,4) = ratioOfBestvsSham(i);
+features(i,5) = avgOfBestand2Neighboring(i);
+features(i,6) = StandardDeviationIncludingBest(i);
+
 end
 
 %% Plotting with GPlotMatrix (Blue and Green Dots)
@@ -124,5 +131,4 @@ end
    [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,Ytest] = correlationCoefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest);
  
 %% End outer for loop where you can run the entire thing multiple times to see if accuracy is consistent 
-
 %end
