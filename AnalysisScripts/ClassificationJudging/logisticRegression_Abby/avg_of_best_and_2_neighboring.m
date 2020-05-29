@@ -1,4 +1,5 @@
-function [features] = avg_of_best_and_2_neighboring(i,thresholds,sham,features)
+function [features] = AvgBestand2Neighboring(i,thresholds,sham,features)
+
     if min(thresholds(2:end-1,i)) < sham(i)
             [m,n] = min(thresholds(1:end-1,i));
             minthresholds = [ thresholds(n,i), thresholds(n-1,i),  thresholds(n+1,i)];                    
@@ -9,4 +10,5 @@ function [features] = avg_of_best_and_2_neighboring(i,thresholds,sham,features)
         end
         avgofbest = mean(minthresholds)/sham(i); 
         features(i,5) = avgofbest;
+        
 end

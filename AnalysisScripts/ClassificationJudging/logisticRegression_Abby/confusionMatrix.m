@@ -19,11 +19,12 @@ function [YPredicted,confusion, Accuracy, ActualNo, PredictedNo, ActualYes, Pred
  sTable = array2table(confusion,'VariableNames',colNames,'RowNames',rowNames)
  
  % Useful Information, Analyzing data
- Accuracy = (TrueNeg + TruePos)/length(Ytest);
+ Accuracy = (TrueNeg + TruePos)/length(Ytest)*100 %In percent. This is what we are trying to increase for Undergrad Games
  Misclassification = (FalsePos + FalseNeg)/length(Ytest);
  TruePosRate = TruePos/ActualYes;
  FalsoPosRate = FalsePos/ActualNo;
  TrueNegRate = TrueNeg/ActualNo;
  Precision = TruePos/PredictedYes;
  Prevelance = ActualYes/length(Ytest);
+ 
 end

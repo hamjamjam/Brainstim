@@ -4,7 +4,7 @@ function subplotSR(thresholds,i,levels,withSR)
          hold on
          subplot(2, 5 ,(i)); % This needs to be changed depending on how many simulations are run
          plot(levels, thresholds(:,i),'*--');
-         ylim([0 0.5]);
+         ylim([0 0.5]); %making it look nicer
          xticks(levels);
          xlabel('SR Noise Level (mA)');
          ylabel('Visual Contrast Threshold');

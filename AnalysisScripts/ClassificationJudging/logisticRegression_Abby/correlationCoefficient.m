@@ -1,4 +1,4 @@
-function [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,s,YPredict,Ytest] = correlationCoefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest)
+function [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,s,Ytest] = correlationCoefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest)
 
 %Would be much better if this was in a for loop
 %% Setting up a matrix that can be indexed later
@@ -93,21 +93,23 @@ end
 %% Plotting the correlated features
 %Plot significant correlations based on the indexing found above. 
 % Green dots mean there is underlying SR, blue means no SR
-for i = 1:length(idx1)
-       figure()
-       A = CorrelationMatrix{idx1(i),1}; % the y-axis 
-       B = CorrelationMatrix{idx1(i),2}; % the x-axis
-       [~,ax] = gplotmatrix(A,B,SRvsNoSR(:)); % categorizing them based on if they have SR or not
-       lsline(ax) % trend lines for each color
-% Have not been able to work out how to set it up so the axes labels change every time
-%        format short g
-%        str1 = sprintf('feature %.f',features(:,HelpfulMatrix{idx1(i),1}));
-%        str2 = sprintf('feature %.f',features(:,HelpfulMatrix{features(i),2}))
-%        title(str,'FontSize',12);
-%        ax(1,1).YLabel = str1;
-%        ax(1,1).XLabel = str2;
-     
-end
+
+%commented this section so graphs don't pop up every time
+% for i = 1:length(idx1)
+%        figure()
+%        A = CorrelationMatrix{idx1(i),1}; % the y-axis 
+%        B = CorrelationMatrix{idx1(i),2}; % the x-axis
+%        [~,ax] = gplotmatrix(A,B,SRvsNoSR(:)); % categorizing them based on if they have SR or not
+%        lsline(ax) % trend lines for each color
+% % Have not been able to work out how to set it up so the axes labels change every time
+% %        format short g
+% %        str1 = sprintf('feature %.f',features(:,HelpfulMatrix{idx1(i),1}));
+% %        str2 = sprintf('feature %.f',features(:,HelpfulMatrix{features(i),2}))
+% %        title(str,'FontSize',12);
+% %        ax(1,1).YLabel = str1;
+% %        ax(1,1).XLabel = str2;
+%      
+% end
 
 %% Correlation between SR and Each Feature
 % s = string(YPredicted);
