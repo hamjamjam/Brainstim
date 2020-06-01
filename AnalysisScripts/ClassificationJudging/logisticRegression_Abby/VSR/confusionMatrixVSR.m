@@ -1,4 +1,4 @@
-function [YPredicted,confusion, Accuracy, ActualNo, PredictedNo, ActualYes, PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos] = confusionMatrix(Predicted_probabilities,Ytest)
+function [YPredicted,confusion, Accuracy, ActualNo, PredictedNo, ActualYes, PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos] = confusionMatrixVSR(Predicted_probabilities,Ytest)
  
  YPredicted = categorical(round(Predicted_probabilities(:,2))); %Creating the prediction for if there is underlying SR or not
  confusion = confusionmat(Ytest,YPredicted); % Confusion matrix 
@@ -16,7 +16,7 @@ function [YPredicted,confusion, Accuracy, ActualNo, PredictedNo, ActualYes, Pred
  % Create Labeled Table to print in command window
  rowNames = {'ActualNo', 'ActualYes'};
  colNames = {'ClassedAsNo', 'ClassedAsYes'};
- sTable = array2table(confusion,'VariableNames',colNames,'RowNames',rowNames)
+ confusionTable = array2table(confusion,'VariableNames',colNames,'RowNames',rowNames)
  
  % Useful Information, Analyzing data
  Accuracy = (TrueNeg + TruePos)/length(Ytest)*100 %In percent. This is what we are trying to increase for Undergrad Games

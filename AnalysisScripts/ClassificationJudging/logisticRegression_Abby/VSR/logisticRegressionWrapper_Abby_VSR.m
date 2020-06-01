@@ -42,12 +42,12 @@ for i = 1:sim_number
         %we get back the sham for each simulation, as well as the second column of the 'features matrix', which is the number of threshold
         %values above sham for any specified simulation
         sham(i) = thresholds(1,i); %sham is the first threshold value for each simulation
-        [threshAboveSham] = ThresholdsAboveSham(i,thresholds(:,i),sham(i)); %this tells us the number of thresholds above sham for each simulation
+        [numberOfThresholdsAboveSham] = ThresholdsAboveShamVSR(i,thresholds(:,i),sham(i)); %this tells us the number of thresholds above sham for each simulation
 
     %% Number of direction changes ignoring first and last values, 3rd column of 'features'
 
         % returns the number of direction changes that each simulation has, excluding first and last values. This is the third column of 'features'
-        [numberOfDirectionChanges] = DirectionChanges(i,thresholds);
+        [numberOfDirectionChanges] = DirectionChangesVSR(i,thresholds);
         
     %% Ratio of best threshold to sham, 4th column of 'features'
     
@@ -58,12 +58,12 @@ for i = 1:sim_number
     %% Avg of best and 2 neighboring, 5th column of 'features'
 
         % returns the average value of the lowest threshold and the two surrounding it for each simulation. Fifth column of 'features'
-        [avgOfBestand2Neighboring] = AvgBestand2Neighboring(i,thresholds,sham);
+        [avgOfBestand2Neighboring] = AvgBestand2NeighboringVSR(i,thresholds,sham);
            
     %% Variance / STD of Threshold Values, 6th column of 'features'
         
         % This is the standard deviation of all threshold values for each simulation including the lowest threshold value
-        [StandardDeviationIncludingBest] = standardDeviationThresholds(i,thresholds,sigma);
+        [StandardDeviationIncludingBest] = standardDeviationThresholdsVSR(i,thresholds,sigma);
         
         %No clear difference between standard deviation and variance, or
         %between including lowest threshold value and excluding lowest
@@ -85,13 +85,17 @@ for i = 1:sim_number
         
 %% Features Matrix
 features(i,1) = i; %the first column of 'features' is the simulation number
-features(i,2) = threshAboveSham(i);
+features(i,2) = numberOfThresholdsAboveSham(i);
 features(i,3) = numberOfDirectionChanges(i);    
 features(i,4) = ratioOfBestvsSham(i);
 features(i,5) = avgOfBestand2Neighboring(i);
 features(i,6) = StandardDeviationIncludingBest(i);
 
 end
+
+%% Features Table
+ featureTitles = {'Sim Number','Number Above Sham','Number of Direction Changes','Ratio Best to Sham','Avg of best and 2 Neighboring','SD Including Best'};
+ featuresTable = array2table(features,'VariableNames',featureTitles);
 
 %% Plotting with GPlotMatrix (Blue and Green Dots)
 
@@ -119,16 +123,16 @@ end
 %% Confusion matrices
 
     % This helps us understand the accuracy of the code. Returns a confusion matrix and tells us certain things about it 
-    [YPredicted,confusion, Accuracy, ActualNo, PredictedNo, ActualYes, PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos] = confusionMatrix(Predicted_probabilities,Ytest);
+    [YPredicted,confusion, Accuracy, ActualNo, PredictedNo, ActualYes, PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos] = confusionMatrixVSR(Predicted_probabilities,Ytest);
 
 %% Chi^2 and p val based on excel 
 
     % Chi^2 test gives p-value
-    [p_chi2] = chiSquared(ActualNo,PredictedNo,ActualYes,PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos);
+    [p_chi2] = chiSquaredVSR(ActualNo,PredictedNo,ActualYes,PredictedYes,TrueNeg,FalseNeg,FalsePos,TruePos);
     
 %% Correlation Coefficients
  
-   [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,Ytest] = correlationCoefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest);
+   [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,Ytest] = correlationCoefficientVSR(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest,featuresTable);
  
 %% End outer for loop where you can run the entire thing multiple times to see if accuracy is consistent 
 %end

@@ -1,4 +1,4 @@
-function [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,s,Ytest] = correlationCoefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest)
+function [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,s,Ytest] = correlationCoefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest,featuresTable)
 
 %Would be much better if this was in a for loop
 %% Setting up a matrix that can be indexed later
@@ -37,7 +37,7 @@ CorrelationMatrix{10,2} = features(:,6);
 %The output from the corrcoef function is a 2x2 matrix of r-values and a
 %2x2 matrix of p-values. [R{#},P{#}] is putting the r-matrix into a cell in
 %R and the p-matrix into a cell in P and creating an array of matrices. 
-
+%[R,P] = corrcoef(features(:,2),VAL1,features(:,3),VAL2,features(:,4),VAL3,features(:,5),VAL4,features(:,6),VAL5)
 % Correlation between 2nd feature and all others
 [R{1},P{1}] = corrcoef(features(:,2),features(:,3));
 [R{2},P{2}] = corrcoef(features(:,2),features(:,4)); 
@@ -91,6 +91,8 @@ for i = 1: length(Pval)
 end
 
 %% Plotting the correlated features
+% %corrplot(features(:,2:end))
+ [R,P] = corrplot(features(:,2),features(:,3),features(:,4),features,'tail','right');
 %Plot significant correlations based on the indexing found above. 
 % Green dots mean there is underlying SR, blue means no SR
 
@@ -131,4 +133,4 @@ Ytest = double(s);
     for i = 1: 5   
         [idx2,num2] = find(Pval2(:) < 0.05);
     end
-end
+ end
