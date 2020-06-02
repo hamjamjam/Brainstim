@@ -91,7 +91,7 @@ for i = 1: length(Pval)
 end
 
 %% Plotting the correlated features
-% %corrplot(features(:,2:end))
+%corrplot(Xtest)
  %[R,P] = corrplot(features(:,2),features(:,3),features(:,4),features(:,5),features(:,6),'tail','right');
 %Plot significant correlations based on the indexing found above. 
 % Green dots mean there is underlying SR, blue means no SR
@@ -111,7 +111,7 @@ end
 % %        ax(1,1).YLabel = str1;
 % %        ax(1,1).XLabel = str2;
 %      
-% end
+%  end
 
 %% Correlation between SR and Each Feature
 % s = string(YPredicted);

@@ -3,13 +3,13 @@ clear all; close all; clc;
 %% parameters that must match up to real life experiment
 %these parameters are kept outside any for loops
 
-%currently set for the visual task with VSR
+%currently set for the ASR Auditory
 N = 50; %Number of trials per simulation
 levels = [0:5:50]; %ASR Aud
 initial_stim = 0.5; %visual task initially at 0.5 contrast
 
 %% parameters that we change
-sim_number = 500; %number of simulations
+sim_number = 10; %number of simulations
 mumean = 0.15;
 muSD = 0.05;
 
@@ -52,7 +52,7 @@ for i = 1:sim_number
     %% Ratio of best threshold to sham, 4th column of 'features'
     
         % returns the ratio of lowest threshold value to sham value for each simulaiton. Fourth column of 'features'
-        ratioOfBestvsSham(i) = min(thresholds(2:end,i))/sham(i); 
+        diffOfBestvsSham(i) = sham(i) - min(thresholds(2:end,i)); 
         %did not create a separate feature because it was just one line of code
        
     %% Avg of best and 2 neighboring, 5th column of 'features'
@@ -84,7 +84,7 @@ for i = 1:sim_number
 features(i,1) = i; %the first column of 'features' is the simulation number
 features(i,2) = numberOfThresholdsAboveSham(i);
 features(i,3) = numberOfDirectionChanges(i);    
-features(i,4) = ratioOfBestvsSham(i);
+features(i,4) = diffOfBestvsSham(i);
 features(i,5) = avgOfBestand2Neighboring(i);
 features(i,6) = StandardDeviationIncludingBest(i);
 
