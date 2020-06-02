@@ -3,13 +3,13 @@ clear all; close all; clc;
 %% parameters that must match up to real life experiment
 %these parameters are kept outside any for loops
 
-%currently set for the visual task with VSR
+%currently set for the ASR Auditory
 N = 50; %Number of trials per simulation
-levels = [0:0.1:1]; %VSR
+levels = [0:5:50]; %ASR Aud
 initial_stim = 0.5; %visual task initially at 0.5 contrast
 
 %% parameters that we change
-sim_number = 200; %number of simulations
+sim_number = 10; %number of simulations
 mumean = 0.15;
 muSD = 0.05;
 
@@ -35,7 +35,7 @@ for i = 1:sim_number
     %% Simulate a subject
     
         %we get back a list of their thresholds for each stimulus level
-        [thresholds(:,i)]= simulateSubject(mu, sigma, levels, withSR, N, initial_stim);
+        [thresholds(:,i),underlyingMus]= simulateSubjectMask(mu, sigma, levels, withSR, N, initial_stim);
         
     %% Number of threshold values above sham, 2nd column of 'features'
     
@@ -52,7 +52,7 @@ for i = 1:sim_number
     %% Ratio of best threshold to sham, 4th column of 'features'
     
         % returns the ratio of lowest threshold value to sham value for each simulaiton. Fourth column of 'features'
-        ratioOfBestvsSham(i) = min(thresholds(2:end,i))/sham(i); 
+        diffOfBestvsSham(i) = sham(i) - min(thresholds(2:end,i)); 
         %did not create a separate feature because it was just one line of code
        
     %% Avg of best and 2 neighboring, 5th column of 'features'
@@ -79,19 +79,23 @@ for i = 1:sim_number
             SRvsNoSR(i,1) = 0;
         end
 
-    %% plot if running 10 simulations
-    
-        %SubplotSR(thresholds,i,levels,withSR)
-        
+   
 %% Features Matrix
 features(i,1) = i; %the first column of 'features' is the simulation number
 features(i,2) = numberOfThresholdsAboveSham(i);
 features(i,3) = numberOfDirectionChanges(i);    
-features(i,4) = ratioOfBestvsSham(i);
+features(i,4) = diffOfBestvsSham(i);
 features(i,5) = avgOfBestand2Neighboring(i);
 features(i,6) = StandardDeviationIncludingBest(i);
 
-end
+
+ %% plot if running 10 simulations
+    
+        SubplotSR(thresholds,i,levels,withSR)
+end        
+%% Features Table
+ featureTitles = {'Sim Number','Number Above Sham','Number of Direction Changes','Ratio Best to Sham','Avg of best and 2 Neighboring','SD Including Best'};
+ featuresTable = array2table(features,'VariableNames',featureTitles);
 
 %% Plotting with GPlotMatrix (Blue and Green Dots)
 
@@ -128,7 +132,7 @@ end
     
 %% Correlation Coefficients
  
-   [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,Ytest] = correlationCoefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest);
+   [Rval,Pval,Pval2,R,P,idx1,R2,P2,idx2,Ytest] = correlationCoefficient(features,sham,SRvsNoSR,Xtest,YPredicted,Ytest,featuresTable);
  
 %% End outer for loop where you can run the entire thing multiple times to see if accuracy is consistent 
 %end
