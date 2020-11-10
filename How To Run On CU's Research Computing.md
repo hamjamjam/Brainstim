@@ -1,4 +1,4 @@
-### How to run Matlab Scripts on CU's Research Computing Resources FROM WINDOWS
+# How to run Matlab Scripts on CU's Research Computing Resources FROM WINDOWS
 
 There is a lot of information [here](https://curc.readthedocs.io/en/latest/software/matlab.html)
 
@@ -45,6 +45,8 @@ Note that no `.m` is needed.
 Here, we are running Matlab without a gui.
 
 You will need to have written your matlab script to output what you want to a file (e.g. a .mat, .csv or .pdf). You will not be able to save anything that is just left in the workspace.
+
+## Saving your outputs
 
 Once your script is done running type:
 
