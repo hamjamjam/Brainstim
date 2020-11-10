@@ -55,21 +55,19 @@ This will move us away from the login node.
 ![No longer in login](submit.PNG)
 
 ## Running the scripts
-Next, we want to run our Matlab scripts. In order to do this a little more easily, I have left a 'runScripts.sh' file in the Analysis Scripts folder which will take user input when running to run a specific script. e.g.
+Next, we want to run our Matlab scripts. In order to do this a little more easily, I have left a 'runScripts.sh' file in the Analysis Scripts folder. Here is how you use it:
 
-`sh runScripts filename`
+`sh runScript.sh filename`
 
 Note that no `.m` is needed.
 
-Here, we are running Matlab without a gui.
-
-You will need to have written your matlab script to output what you want to a file (e.g. a .mat, .csv or .pdf). You will not be able to save anything that is just left in the workspace.
+We are running Matlab without a gui. You will need to have written your matlab script to output what you want to a file (e.g. a .mat, .csv or .pdf). You will not be able to save anything that is just left in the workspace.
 
 ![Run a Script](runscript.PNG)
 
 ## Saving your outputs
 
-Once your script is done running type:
+Once your script is done running, you can look at the environment variables with `whos`. You can then you standard matlab commands to look at what you have and confirm that your script ran correctly. Once you are happy with it, type:
 
 `exit`
 
