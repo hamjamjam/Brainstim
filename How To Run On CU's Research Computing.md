@@ -38,6 +38,12 @@ will take you into your repo (hopefully containing your Matlab scripts).
 
 ![my repo](ls.PNG)
 
+Alternatively, you can open up a windows command line and use:
+
+`pscp -P 22 local_filename.txt username@login.rc.colorado.edu:/home/username`
+
+The command `pscp` is kind of like a windows version of `scp`. We need to pass in the port (`-P 22`) and we are only able to write into our home directory.
+
 ## Submitting a job to an interactive node
 There are steps [here](https://curc.readthedocs.io/en/latest/software/matlab.html) to run matlab scripts.
 
