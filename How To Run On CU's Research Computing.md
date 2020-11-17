@@ -71,6 +71,14 @@ We are running Matlab without a gui. You will need to have written your matlab s
 
 ![Run a Script](runscript.PNG)
 
+You can use `sh runScript.sh filename &` to run the script and get back your command line. Once you have commandline back, you can check in on your process with `ps`.
+
+Script can also be run and left to run even if you close your connection (e.g. if you set it up to run and pour all the results into a .txt file or something). Use this:
+
+`nohup sh runScript.sh filename &`
+
+The `&` will give you back the command line and `nohup` tells it not to stop even if you close the connection.
+
 ## Saving your outputs
 
 Once your script is done running, you can look at the environment variables with `whos`. You can then you standard matlab commands to look at what you have and confirm that your script ran correctly. Once you are happy with it, type:
